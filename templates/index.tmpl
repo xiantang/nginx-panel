@@ -1,0 +1,48 @@
+<html>
+	<h1>
+		{{ .title }}
+	</h1>
+	<form id="form">
+		<input type="text" name="domain" placeholder="Enter domain name">
+		<textarea  name="config"> </textarea>
+		<input type="submit" value="Submit">
+	</form>
+</html>
+
+<!--post body as json use java script-->
+<!--{-->
+<!--	"domain": "example.com",-->
+<!--	"config": "config"-->
+<!--}-->
+
+<!--post body as json data use javascript-->
+<script>
+	var form = document.getElementById("form");
+	form.addEventListener("submit", function(e) {
+		e.preventDefault();
+		// should  post body like below
+		// {
+		// 	"config_body":"server {\nlisten 127.0.0.1:8089;\n# Additional server configuration\nlocation /some/path/ {\nreturn 200;\n}\n}",
+		// 		"server_name":"shopee.com"
+		// }
+		var data = {
+			"config_body": form.config.value,
+			"server_name": form.domain.value
+		}
+		// data to json
+		var data_json = JSON.stringify(data);
+		// post data to server
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", "http://localhost:8080/config/create", true);
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(data_json);
+		// check response
+		xhr.onreadystatechange = function() {
+			// check error
+			if (xhr.status !== 200 && xhr.readyState === 4) {
+				// print detail error
+				alert(xhr.status + ": " + xhr.statusText);
+			}
+		}
+	});
+</script>

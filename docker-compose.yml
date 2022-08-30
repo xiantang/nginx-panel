@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+  balancer:
+    build:
+      context: .
+      dockerfile: dockerfiles/dockerfile.balancer
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - app-net
+    volumes:
+      - .:/app
+
+  panel:
+    build:
+      context: .
+      dockerfile: dockerfiles/dockerfile.panel
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+  etcd:
+    image: "bitnami/etcd"
+    platform: linux/amd64
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - "2379:2379"
+    networks:
+      - app-net
+
+networks:
+  app-net:
+    driver: bridge

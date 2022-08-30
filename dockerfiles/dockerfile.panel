@@ -1,0 +1,36 @@
+FROM golang:1.19
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    libcurl4-openssl-dev \
+    libffi-dev \
+    libgmp-dev \
+    libjpeg-dev \
+    libpq-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libyaml-dev \
+    zlib1g-dev \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# install nginx
+RUN apt-get update && apt-get install -y nginx && \
+    go install github.com/cosmtrek/air@latest
+
+# copy the source code to the container
+WORKDIR /app
+COPY ../go.mod .
+RUN go mod download
+COPY ../.. .
+RUN mkdir -p /etc/nginx/tests/ && mkdir -p /etc/nginx/http-enabled/
+COPY ../configs/ /etc/nginx/
+
+
+EXPOSE 8080
+CMD ["air"]
