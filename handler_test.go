@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"golang/internal/etcd"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 	clientv3 "go.etcd.io/etcd/client/v3"
-	"testing"
 )
 
 func Test_handleSubmit(t *testing.T) {
@@ -15,17 +18,21 @@ func Test_handleSubmit(t *testing.T) {
 	}
 
 	path := t.TempDir() + "/test.conf"
+	etcd.ETCDPath = "http://localhost:2379"
 	filePath = path
-	etcdPATH = "http://localhost:2379"
 	err := handleSubmit(req)
 	assert.NoError(t, err)
 	// get value from etcd
+	t.Log("get value from etcd")
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints: []string{etcdPATH},
+		Endpoints:   []string{etcd.ETCDPath},
+		DialTimeout: 5 * time.Second,
 	})
 	assert.NoError(t, err)
 	defer cli.Close()
-	resp, err := cli.Get(context.Background(), "/config/shopee.com")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	resp, err := cli.Get(ctx, "/config/shopee.com")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(resp.Kvs))
 	assert.Equal(t, req.ConfigBody, string(resp.Kvs[0].Value))

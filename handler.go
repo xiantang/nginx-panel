@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"golang/internal/etcd"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -15,7 +16,6 @@ import (
 )
 
 var filePath = "/etc/nginx/tests/test.conf"
-var etcdPATH = "http://etcd:2379"
 
 type NginxReq struct {
 	ConfigBody string `json:"config_body"`
@@ -46,7 +46,7 @@ func handleSubmit(nginxReq NginxReq) error {
 
 	// write success config into etcd
 	cli, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{etcdPATH},
+		Endpoints:   []string{etcd.ETCDPath},
 		DialTimeout: 5 * time.Second,
 	})
 	if err != nil {
@@ -58,7 +58,11 @@ func handleSubmit(nginxReq NginxReq) error {
 	log.WithField("config", nginxReq.SererName).Info("write config to etcd")
 
 	key := "/config/" + nginxReq.SererName
-	_, err = cli.Put(context.Background(), key, nginxReq.ConfigBody)
+	// with timeout
+	log.WithField("key", key).Info("put config to etcd")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err = cli.Put(ctx, key, nginxReq.ConfigBody)
 	if err != nil {
 		log.WithError(err).Error("put config to etcd error")
 		return err
