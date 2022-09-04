@@ -24,11 +24,11 @@ RUN apt-get update && apt-get install -y nginx && \
     go install github.com/cosmtrek/air@latest
 
 WORKDIR /app
-COPY ../go.mod .
+COPY go.mod .
 RUN go mod download
-COPY ../.. .
+COPY . .
 RUN mkdir -p /etc/nginx/tests/ && mkdir -p /etc/nginx/http-enabled/ && rm /etc/nginx/sites-enabled/default
-COPY ../configs/ /etc/nginx/
+COPY configs/ /etc/nginx/
 
 EXPOSE 80
 

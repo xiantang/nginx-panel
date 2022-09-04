@@ -25,11 +25,11 @@ RUN apt-get update && apt-get install -y nginx && \
 
 # copy the source code to the container
 WORKDIR /app
-COPY ../go.mod .
+COPY go.mod .
 RUN go mod download
-COPY ../.. .
+COPY . .
 RUN mkdir -p /etc/nginx/tests/ && mkdir -p /etc/nginx/http-enabled/
-COPY ../configs/ /etc/nginx/
+COPY configs/ /etc/nginx/
 
 
 EXPOSE 8080
