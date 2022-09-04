@@ -1,13 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"golang/internal/etcd"
-	"io/ioutil"
+	"golang/internal/nginx"
 	"net/http"
-	"os"
-	"os/exec"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +36,7 @@ func submit(c *gin.Context) {
 }
 
 func handleSubmit(nginxReq NginxReq) error {
-	err := NginxTest(nginxReq.ConfigBody)
+	err := nginx.Test(nginxReq.ConfigBody)
 	if err != nil {
 		return err
 	}
@@ -65,31 +62,6 @@ func handleSubmit(nginxReq NginxReq) error {
 	_, err = cli.Put(ctx, key, nginxReq.ConfigBody)
 	if err != nil {
 		log.WithError(err).Error("put config to etcd error")
-		return err
-	}
-
-	return nil
-}
-
-// NginxTest do nginx test nginx -t
-func NginxTest(body string) error {
-	if os.Getenv("SKIP_NGINX_TEST") == "true" {
-		return nil
-	}
-	log.WithField("config", body).Info("nginx test")
-	// write file to /etc/nginx/test/ than do nginx -t
-
-	if err := ioutil.WriteFile(filePath, []byte(body), 0644); err != nil {
-		log.WithField("config", body).WithError(err).Error("write file error")
-		return err
-	}
-	defer os.Remove(filePath)
-	cmd := exec.Command("nginx", "-c", "/etc/nginx/nginx_test.conf", "-t")
-	buf := bytes.NewBufferString("")
-	cmd.Stderr = buf
-	err := cmd.Run()
-	if err != nil {
-		log.WithField("output", buf.String()).WithError(err).Error("nginx -t error")
 		return err
 	}
 
