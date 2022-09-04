@@ -34,9 +34,54 @@ func list(c *gin.Context) {
 	})
 }
 
+// get nginx config from etcd by server name
+func get(c *gin.Context) {
+	serverName := c.Param("server_name")
+	if serverName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "server_name is empty",
+		})
+		return
+	}
+	body, err := handleGet(c, serverName)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": body,
+	})
+}
+
+// handleGet get nginx config from etcd by server name
+func handleGet(c context.Context, serverName string) (string, error) {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{etcd.ETCDPath},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		log.WithError(err).Error("connect etcd error")
+		return "", err
+	}
+	defer cli.Close()
+	key := "/config/" + serverName
+	log.WithField("key", key).Info("get config from etcd")
+	resp, err := cli.Get(c, key)
+	if err != nil {
+		log.WithError(err).Error("get config from etcd error")
+		return "", err
+	}
+	if len(resp.Kvs) == 0 {
+		return "", errors.New("not found")
+	}
+	return string(resp.Kvs[0].Value), nil
+}
+
 // delete nginx config from etcd by server name
 func del(c *gin.Context) {
-	// read from url  	group.DELETE("/del/:server_name", del)
 	serverName := c.Param("server_name")
 	err := handleDelete(c, serverName)
 	if err != nil {
