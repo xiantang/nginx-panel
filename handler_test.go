@@ -20,7 +20,7 @@ func Test_handleSubmit(t *testing.T) {
 	path := t.TempDir() + "/test.conf"
 	etcd.ETCDPath = "http://localhost:2379"
 	filePath = path
-	err := handleSubmit(req)
+	err := handleCreate(req)
 	assert.NoError(t, err)
 	// get value from etcd
 	t.Log("get value from etcd")

@@ -9,22 +9,10 @@
 	</form>
 </html>
 
-<!--post body as json use java script-->
-<!--{-->
-<!--	"domain": "example.com",-->
-<!--	"config": "config"-->
-<!--}-->
-
-<!--post body as json data use javascript-->
 <script>
 	var form = document.getElementById("form");
 	form.addEventListener("submit", function(e) {
 		e.preventDefault();
-		// should  post body like below
-		// {
-		// 	"config_body":"server {\nlisten 127.0.0.1:8089;\n# Additional server configuration\nlocation /some/path/ {\nreturn 200;\n}\n}",
-		// 		"server_name":"shopee.com"
-		// }
 		var data = {
 			"config_body": form.config.value,
 			"server_name": form.domain.value

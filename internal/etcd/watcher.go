@@ -92,17 +92,22 @@ func (w *Syncer) sync() error {
 	}
 
 	log.Info("file written")
+	if os.Getenv("SKIP_NGINX_TEST") == "true" {
+		log.Info("skip nginx test")
+	} else {
+		// nginx test
 
-	cmd := exec.Command("nginx", "-c", "/etc/nginx/nginx_test.conf", "-t")
+		cmd := exec.Command("nginx", "-c", "/etc/nginx/nginx_test.conf", "-t")
 
-	buf := bytes.NewBufferString("")
-	cmd.Stderr = buf
-	err = cmd.Run()
-	if err != nil {
-		log.WithError(err).Error("nginx -t error")
-		return err
+		buf := bytes.NewBufferString("")
+		cmd.Stderr = buf
+		err = cmd.Run()
+		if err != nil {
+			log.WithError(err).Error("nginx -t error")
+			return err
+		}
+		log.Info("nginx -t success")
 	}
-	log.Info("nginx -t success")
 
 	// copy files from nginx/tests/ to nginx/http-enabled/
 
@@ -119,17 +124,18 @@ func (w *Syncer) sync() error {
 	}
 
 	log.Info("schemas updated")
-	// nginx -s reload
-	cmd = exec.Command("nginx", "-s", "reload")
-	buf = bytes.NewBufferString("")
-	cmd.Stderr = buf
-	err = cmd.Run()
-	if err != nil {
-		log.WithField("output", buf.String()).WithError(err).Error("nginx -s reload error")
-		return err
+	if os.Getenv("SKIP_RELOAD") == "true" {
+		log.Info("skip nginx reload")
+	} else {
+		cmd := exec.Command("nginx", "-s", "reload")
+		buf := bytes.NewBufferString("")
+		cmd.Stderr = buf
+		err = cmd.Run()
+		if err != nil {
+			log.WithField("output", buf.String()).WithError(err).Error("nginx -s reload error")
+			return err
+		}
+		log.Info("nginx reload success")
 	}
-
-	// reload success
-	log.Info("nginx reload success")
 	return nil
 }

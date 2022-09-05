@@ -13,6 +13,7 @@ import (
 // write config just `server {}` to etcd
 func TestBasicAddConfig(t *testing.T) {
 	t.Setenv("SKIP_NGINX_TEST", "true")
+	t.Setenv("SKIP_RELOAD", "true")
 	t.Log("TestBasicWatch")
 	ETCDPath = "http://localhost:2379"
 	client := GetClient()
@@ -38,6 +39,8 @@ func TestBasicAddConfig(t *testing.T) {
 
 func TestBasicWatch(t *testing.T) {
 	t.Log("TestBasicWatch")
+	t.Setenv("SKIP_NGINX_TEST", "true")
+	t.Setenv("SKIP_RELOAD", "true")
 	ETCDPath = "http://localhost:2379"
 	client := GetClient()
 	ctx := context.Background()
