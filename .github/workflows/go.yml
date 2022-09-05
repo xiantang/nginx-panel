@@ -32,7 +32,7 @@ jobs:
     - name: Test
       run: go test -v -coverprofile=coverage.out -covermode=atomic ./...
 
-    - name: Upload coverage to Codecov
+    - name: Code coverage
       uses: codecov/codecov-action@v3
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
