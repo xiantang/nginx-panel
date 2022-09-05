@@ -26,8 +26,8 @@ jobs:
           image: "bitnami/etcd"
             #platform: linux/amd64
           env:
-            - ALLOW_NONE_AUTHENTICATION=yes
-            - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+            ALLOW_NONE_AUTHENTICATION: yes
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
           port:
             - "2379:2379"
     steps:
