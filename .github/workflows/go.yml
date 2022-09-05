@@ -6,10 +6,31 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
 
+      #          image: "bitnami/etcd"
+      #    platform: linux/amd64
+      #    environment:
+      #      - ALLOW_NONE_AUTHENTICATION=yes
+      #      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      #    ports:
+      #      - "2379:2379"
+      #    networks:
+      #      - app-net
+
+
+jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      image: 
+          etcd: 
+            image: "bitnami/etcd"
+              #platform: linux/amd64
+            env:
+              - ALLOW_NONE_AUTHENTICATION=yes
+              - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+            port:
+              - "2379:2379"
     steps:
     - uses: actions/checkout@v3
 
