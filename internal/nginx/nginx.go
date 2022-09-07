@@ -11,8 +11,8 @@ import (
 
 var filePath = "/etc/nginx/tests/test.conf"
 
-// Test do nginx test nginx -t
-func Test(body string) error {
+// TestFile do nginx test nginx -t
+func TestFile(body string) error {
 	if os.Getenv("SKIP_NGINX_TEST") == "true" {
 		return nil
 	}

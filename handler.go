@@ -175,7 +175,7 @@ func handleList(c context.Context) ([]NginxReq, error) {
 }
 
 func handleCreate(nginxReq NginxReq) error {
-	err := nginx.Test(nginxReq.ConfigBody)
+	err := nginx.TestFile(nginxReq.ConfigBody)
 	if err != nil {
 		return err
 	}

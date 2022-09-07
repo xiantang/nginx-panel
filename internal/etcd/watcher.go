@@ -86,6 +86,15 @@ func (w *Syncer) sync() error {
 		log.WithField("path", path).Info("write file")
 		ioutil.WriteFile(path, []byte(v), 0644)
 	}
+	// write updated file
+	for k, v := range updatedMap {
+		// write file
+		s := strings.Split(k, "/")
+		fileName := s[len(s)-1]
+		path := fmt.Sprintf("%v%v.conf", "/etc/nginx/tests/", fileName)
+		log.WithField("path", path).Info("write file")
+		ioutil.WriteFile(path, []byte(v), 0644)
+	}
 
 	if len(addedMap) == 0 && len(updatedMap) == 0 {
 		return nil
@@ -119,7 +128,18 @@ func (w *Syncer) sync() error {
 		ioutil.WriteFile(path, []byte(v), 0644)
 	}
 
+	for k, v := range updatedMap {
+		// write file
+		s := strings.Split(k, "/")
+		fileName := s[len(s)-1]
+		path := fmt.Sprintf("%v%v.conf", "/etc/nginx/http-enabled/", fileName)
+		ioutil.WriteFile(path, []byte(v), 0644)
+	}
+
 	for k, v := range addedMap {
+		w.schemas[k] = v
+	}
+	for k, v := range updatedMap {
 		w.schemas[k] = v
 	}
 
